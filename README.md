@@ -30,7 +30,12 @@ Este repositorio contiene el código y los recursos para un sistema de apoyo al 
 
 El objetivo de este proyecto es desarrollar una herramienta de apoyo clínico que mejore la precisión y rapidez en el diagnóstico de enfermedades cardíacas. La implementación permite realizar predicciones personalizadas sobre el riesgo de ECV y ofrecer respuestas médicas precisas a través de un asistente biomédico, contribuyendo a una atención médica más eficaz y personalizada.
 
+## Estructura del Proyecto
 
+- `app.py`: Archivo principal de la aplicación que ejecuta el sistema de predicción y NLP.
+- `codigo_TFM.py`: Contiene las funciones y métodos para el modelo de predicción y procesamiento de datos.
+- `home.html`: Página de inicio de la aplicación web que permite la interacción con el sistema.
+- `README.md`: Documentación del proyecto.
 
 ## Instalación
 
@@ -42,46 +47,11 @@ El objetivo de este proyecto es desarrollar una herramienta de apoyo clínico qu
 
 ### Clonación del Repositorio
 
+Para clonar el repositorio, ejecuta los siguientes comandos en tu terminal:
+
 ```bash
 git clone https://github.com/carpasgis2/TFM.git
-cd TFM
-Instalación de Dependencias
-Instala las dependencias del proyecto ejecutando:
+cd TFNM
 
-bash
-Copiar código
-pip install -r requirements.txt
-Uso
-Entrenamiento del Modelo de Machine Learning
-Asegúrate de que el conjunto de datos esté en la carpeta data/.
-Ejecuta el script de entrenamiento train_model.py para entrenar el modelo de predicción de riesgo cardiovascular.
-bash
-Copiar código
-python scripts/train_model.py
-Uso del Asistente Biomédico NLP
-Ejecuta el asistente de NLP con el script run_nlp_assistant.py, proporcionando una consulta médica relacionada con cardiología.
-bash
-Copiar código
-python scripts/run_nlp_assistant.py
-Este asistente NLP procesará la consulta, recuperará información relevante y generará respuestas en base al contexto.
-Recuperación de Información Médica
-El sistema de recuperación utiliza FAISS para realizar búsquedas eficientes en la base de datos de documentos médicos. Estos fragmentos de texto se combinan con el asistente NLP para generar respuestas contextualizadas.
-
-Ejemplos de Uso
-bash
-Copiar código
-# Ejecutar el modelo de predicción de riesgo cardiovascular
-python scripts/predict_risk.py --data data/sample_patient_data.csv
-
-# Consultar al asistente biomédico sobre tratamiento para un tipo específico de dolor torácico
-python scripts/run_nlp_assistant.py --query "¿Cuál es el tratamiento recomendado para la angina típica?"
-Evaluación
-El rendimiento del modelo de predicción se evalúa en términos de precisión, sensibilidad y especificidad. Los resultados incluyen gráficas y tablas generadas en results/ que muestran el rendimiento en distintos conjuntos de prueba.
-
-Contribuciones
-Las contribuciones son bienvenidas. Por favor, abre un issue o pull request para sugerir mejoras o resolver problemas. Asegúrate de seguir las buenas prácticas de código y documentar cualquier cambio en el README.md cuando sea relevante.
-
-Licencia
-Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
 
 
