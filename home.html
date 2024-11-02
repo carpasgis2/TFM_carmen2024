@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Biomédico</title>
+    <style>
+        /* Estilos básicos */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #b22222; /* Tonalidad de rojo */
+            position: relative;
+        }
+        /* Ajuste para el icono a la derecha del título */
+        h1::after, h2::after {
+            content: url('/path/to/icon.png'); /* Cambia '/path/to/icon.png' por la ubicación real de tu icono */
+            position: absolute;
+            right: -40px;
+            top: 0;
+            transform: translateY(20%);
+        }
+        .form-container, .chat-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #b22222; /* Tonalidad de rojo */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-box {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            white-space: pre-wrap; /* Para respetar los saltos de línea */
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user-message {
+            text-align: right;
+            color: #b22222; /* Tonalidad de rojo */
+            font-weight: bold;
+        }
+        .assistant-message {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Asistente Biomédico</h1>
+
+        <!-- Sección de predicción -->
+        <div class="form-container">
+            <h2>Formulario de Predicción de Riesgo Cardíaco</h2>
+            <form id="prediction-form">
+                <div class="form-group">
+                    <label for="age">Edad:</label>
+                    <input type="number" id="age" name="age" required>
+                </div>
+                <div class="form-group">
+                    <label for="sex">Sexo:</label>
+                    <select id="sex" name="sex" required>
+                        <option value="">Seleccionar</option>
+                        <option value="0">Femenino</option>
+                        <option value="1">Masculino</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cp">Tipo de Dolor en el Pecho:</label>
+                    <select id="cp" name="cp" required>
+                        <option value="">Seleccionar</option>
+                        <option value="0">Asintomático</option>
+                        <option value="1">Angina atípica</option>
+                        <option value="2">Angina típica</option>
+                        <option value="3">No anginoso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resting_bp">Presión Arterial en Reposo:</label>
+                    <input type="number" id="resting_bp" name="resting_bp" required>
+                </div>
+                <div class="form-group">
+                    <label for="cholesterol">Colesterol:</label>
+                    <input type="number" id="cholesterol" name="cholesterol" required>
+                </div>
+                <div class="form-group">
+                    <label for="fasting_bs">Glucemia en Ayunas:</label>
+                    <select id="fasting_bs" name="fasting_bs" required>
+                        <option value="">Seleccionar</option>
+                        <option value="0">No</option>
+                        <option value="1">Sí</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resting_ecg">ECG en Reposo:</label>
+                    <select id="resting_ecg" name="resting_ecg" required>
+                        <option value="">Seleccionar</option>
+                        <option value="0">Normal</option>
+                        <option value="1">Anormalidad en ST-T</option>
+                        <option value="2">Hipertrofia ventricular izquierda</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="max_hr">Frecuencia Cardíaca Máxima:</label>
+                    <input type="number" id="max_hr" name="max_hr" required>
+                </div>
+                <div class="form-group">
+                    <label for="exercise_angina">Angina Inducida por Ejercicio:</label>
+                    <select id="exercise_angina" name="exercise_angina" required>
+                        <option value="">Seleccionar</option>
+                        <option value="0">No</option>
+                        <option value="1">Sí</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="oldpeak">Oldpeak:</label>
+                    <input type="number" step="0.1" id="oldpeak" name="oldpeak" required>
+                </div>
+                <div class="form-group">
+                    <label for="st_slope">Pendiente del ST:</label>
+                    <select id="st_slope" name="st_slope" required>
+                        <option value="">Seleccionar</option>
+                        <option value="0">Ascendente</option>
+                        <option value="1">Plana</option>
+                        <option value="2">Descendente</option>
+                    </select>
+                </div>
+                <button type="button" class="button" onclick="predictRisk()">Obtener Predicción</button>
+            </form>
+            <div id="prediction-result" class="chat-box"></div>
+        </div>
+
+        <!-- Sección de Chat con el Asistente -->
+        <div class="chat-container">
+            <h2>Chat con el Asistente Biomédico</h2>
+            <div id="chat-box" class="chat-box"></div>
+            <div class="form-group">
+                <input type="text" id="chat-input" placeholder="Escribe tu pregunta...">
+                <button type="button" class="button" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Función para realizar predicción de riesgo cardíaco
+        function predictRisk() {
+            const formData = new FormData(document.getElementById('prediction-form'));
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('prediction-result').innerHTML = data.prediction || data.error;
+            })
+            .catch(error => {
+                document.getElementById('prediction-result').innerHTML = "Error al obtener la predicción.";
+                console.error("Error:", error);
+            });
+        }
+
+        // Función para enviar mensajes al asistente biomédico
+        function sendMessage() {
+            const inputElement = document.getElementById('chat-input');
+            const message = inputElement.value;
+            if (!message) {
+                console.log("No message to send");
+                return;  // No envía nada si el mensaje está vacío
+            }
+
+            // Muestra el mensaje del usuario en la interfaz
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<div class="message user-message">Tú: ${message}</div>`;
+            inputElement.value = ''; // Limpia el campo de entrada
+
+            console.log("Sending message:", message); // Depuración
+
+            // Envía el mensaje al backend
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })  // Asegúrate de que `message` esté en el JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response received:", data); // Depuración
+                // Muestra la respuesta del asistente
+                chatBox.innerHTML += `<div class="message assistant-message">Asistente: ${data.response || data.error}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Desplazar hacia abajo
+            })
+            .catch(error => {
+                chatBox.innerHTML += `<div class="message assistant-message">Error en el servidor.</div>`;
+                console.error("Error:", error);
+            });
+}
+
+    </script>
+</body>
+</html>
