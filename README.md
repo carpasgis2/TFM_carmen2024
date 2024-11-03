@@ -52,6 +52,35 @@ Para clonar el repositorio, ejecuta los siguientes comandos en tu terminal:
 ```bash
 git clone https://github.com/carpasgis2/TFM.git
 cd TFNM
+  ```
+### License
+**Copyright © 2024 Carmen Pascual**
 
+**Todos los derechos reservados.**
+ 
+Este software y el código fuente asociado son propiedad exclusiva de Carmen Pascual y no pueden ser utilizados, copiados, modificados, ni distribuidos sin el permiso explícito y por escrito de los titulares de los derechos de autor.
 
-
+**Términos de Uso:**
+ 
+1. **Uso Personal y No Comercial**: Solo está permitido el uso personal y no comercial de este software. No se permite ningún uso en aplicaciones comerciales ni en entornos de producción sin una licencia comercial específica otorgada por Carmen Pascual.
+ 
+2. **Prohibición de Modificación y Distribución**: No está permitida la modificación, distribución, sublicencia o cualquier forma de redistribución del código o del software en su totalidad o en parte sin autorización previa por escrito.
+ 
+3. **Limitación de Responsabilidad**: Este software se proporciona "tal cual", sin garantías de ningún tipo, ya sean explícitas o implícitas, incluyendo, entre otras, garantías de comerciabilidad, adecuación para un propósito particular, o no infracción. En ningún caso los autores serán responsables de cualquier reclamo, daño u otra responsabilidad que surja del uso o de la imposibilidad de usar el software.
+ 
+4. **Uso de Datos y Privacidad**: Cualquier dato utilizado o procesado por este software debe cumplir con todas las leyes y regulaciones de privacidad vigentes. Carmen Pascual no se responsabiliza de la forma en que los usuarios gestionen los datos personales o clínicos procesados por este software.
+ 
+5. **Restricciones en Ingeniería Inversa**: Queda prohibido desensamblar, descompilar, o aplicar ingeniería inversa a cualquier parte de este software.
+ 
+Para obtener más información sobre los términos de la licencia o para adquirir una licencia comercial, por favor contacta a: [Tu dirección de contacto o la de tu organización]
+ 
+### Keywords
+- Cardiovascular diseases (CVD)
+- Myocardial infarction
+- Machine Learning (ML)
+- Deep Learning (DL)
+- Artificial intelligence in cardiology
+- Clinical risk factors
+- Clinical decision support
+- Natural Language Processing (NLP)
+- Transformers architecture
