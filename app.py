@@ -289,6 +289,15 @@ assistant = BiomedicalAssistant(base_url="http://172.20.8.120:2345", retriever= 
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler
 
+def predict_heart_disease(model1, patient_data):
+    try:
+        prediction = model1.predict(patient_data)[0]
+        return 'Alto riesgo' if prediction == 1 else 'Bajo riesgo'
+    except Exception as e:
+        return f"No se pudo realizar la predicción debido a un error: {e}"
+
+
+
 # Rutas de Flask
 @app.route('/')
 def index():
@@ -318,24 +327,21 @@ def predict():
         # Convertir a DataFrame y asegurar que todos los valores son numéricos
         patient_df = pd.DataFrame([patient_data])
         patient_df = patient_df.apply(pd.to_numeric, errors='coerce')
+        patient_df = patient_df.astype('float64')
+        
 
         # Cargar el scaler en esta ruta específica
         with open('scaler.pkl', 'rb') as f:
             scaler = pickle.load(f)
         
-        # Confirmar el tipo de scaler
-        print(f"Tipo de scaler después de cargar: {type(scaler)}")
-        if not isinstance(scaler, StandardScaler):
-            raise ValueError("El objeto cargado no es una instancia de StandardScaler")
 
-        # Transformar los datos del paciente con el scaler
-        print("Transformando los datos con el scaler cargado en tiempo real...")
+
         patient_scaled = scaler.transform(patient_df)
-        print("Datos escalados:", patient_scaled)
 
         # Realizar la predicción
-        prediction = model1.predict(patient_scaled)[0]
-        prediction_text = 'Alto riesgo' if prediction == 1 else 'Bajo riesgo'
+        prediccion = predict_heart_disease(model1, patient_scaled)
+        prediction_text = 'Alto riesgo de enfermedad cardíaca' if prediccion == 1 else 'Bajo riesgo de enfermedad cardíaca'
+
 
         return jsonify({'prediction': prediction_text})
 
