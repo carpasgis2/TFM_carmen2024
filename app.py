@@ -248,11 +248,10 @@ Si la pregunta es "¿cuáles son los últimos avances...?", busca únicamente en
             
             # Obtener respuesta generada por el modelo
             generated_text = self.send_chat(messages)
-            
+            respuesta_modelo = generated_text.replace("Respuesta:", "").replace("**", "<b>").replace("**", "</b>")
             # Procesar y devolver el texto en formato de texto plano
-            plain_text_response = self.process_plain_text(generated_text, retrieved_docs)
+            plain_text_response = self.process_plain_text(respuesta_modelo, retrieved_docs)
             return plain_text_response
-
         except Exception as e:
             return f"Error al generar la respuesta: {str(e)}"
     
