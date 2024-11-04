@@ -11,20 +11,34 @@ import requests
 import os
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import accuracy_score
+from sklearn.impute import SimpleImputer
+import matplotlib.pyplot as plt
+import seaborn as sns
+import traceback
 
 app = Flask(__name__)
-
-
-# Cargar el modelo de predicción de enfermedad cardíaca
+# Cargar el scaler y el modelo entrenado
+scaler_filename = 'scaler.pkl'
 model1_filename = 'modelo_entrenado.pkl'
 
-if not os.path.exists(model1_filename):
-    # Aquí iría el código para entrenar y guardar el modelo
-    pass
-else:
+# Verificar que scaler y modelo están cargados correctamente
+try:
+    with open(scaler_filename, 'rb') as f:
+        scaler = pickle.load(f)
+    print(f"{scaler_filename} cargado correctamente.")
+    print(f"Tipo de scaler: {type(scaler)}")
+
     with open(model1_filename, 'rb') as f:
         model1 = pickle.load(f)
+    print(f"{model1_filename} cargado correctamente.")
+    print(f"Tipo de modelo: {type(model1)}")
+except Exception as e:
+    print("Error al cargar scaler o modelo:")
+    traceback.print_exc()
+
 
 # Configuración del tokenizer y modelo de embeddings
 model_name = "jinaai/jina-embeddings-v2-base-es"
@@ -32,7 +46,6 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model_embeddings = AutoModel.from_pretrained(model_name, trust_remote_code=True)
 device = torch.device("cpu")
 model_embeddings.to(device)
-
 
 
 # Definir la clase LangChain_Embeddings
@@ -70,7 +83,7 @@ def save(file_name, data):
         pickle.dump(data, f)
     print(f"Archivo guardado correctamente en {file_name}")
 
-# Función para cargar y extraer el contenido de un PDF
+
 def load_document_pypdf2(pdf_path):
     documents = []
     try:
@@ -142,28 +155,15 @@ class BiomedicalAssistant:
 Eres un asistente especializado en enfermedades cardíacas. Tu tarea es proporcionar respuestas claras, objetivas y basadas exclusivamente en los datos médicos y el contenido del documento proporcionado. Debes ofrecer interpretaciones precisas para el diagnóstico y manejo de condiciones cardiovasculares, como infarto de miocardio, hipertensión, arritmias, entre otras.
 
 Instrucciones de Respuesta:
+
 Contenido Relevante: Responde únicamente con la información relevante del documento o de fuentes científicas cuando no haya datos en el documento.
 Formato: Organiza las respuestas en párrafos bien estructurados. Usa negritas para conceptos clave y listas numeradas cuando sea necesario.
-
-Referencias:
-Al final de la respuesta, incluye una sección titulada "Referencias:" en un párrafo separado.
-Enumera las referencias en este formato: "- [1] Documento proporcionado (Página X)."
-Solo usa referencias directas del documento y, si no hay, utiliza el nombre de la fuente científica, indicando el artículo o fuente específica.
+Referencias: Al final de la respuesta, incluye una sección titulada "Referencias:" en un párrafo separado. Enumera las referencias en este formato: "- [1] Documento proporcionado (Página X)." Solo usa referencias directas del documento y, si no hay, utiliza el nombre de la fuente científica, indicando el artículo o fuente específica.
 
 Respuestas Específicas:
+
 Si la consulta es "¿qué enfermedad tiene el paciente?", utiliza exclusivamente los datos proporcionados en "Datos del paciente".
-Si la pregunta es "¿cuáles son los últimos avances...?", busca únicamente en artículos recientes de PubMed.
-
-Ejemplo de Estructura de Respuesta:
-Respuesta: La respuesta concreta y clara a la consulta.
-
-Referencias:
-
-[1] Documento proporcionado (Página 117).
-[2] European Resuscitation Council (2010).
-[3] Balbacid Domingo, E. J., Suárez Barrientos, A., & Herrero Brocal, M.
-
-
+Si la pregunta es "¿cuáles son los últimos avances...?", busca únicamente en artículos recientes de PubMed."
 
 """
 
@@ -297,8 +297,9 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Obtener datos del formulario
         print("Obteniendo datos del formulario...")
+
+        # Obtener datos del formulario
         patient_data = {
             'Age': request.form.get('age'),
             'Sex': request.form.get('sex'),
@@ -314,62 +315,34 @@ def predict():
         }
         print(f"Datos del formulario recibidos: {patient_data}")
 
-        # Convertir a DataFrame
+        # Convertir a DataFrame y asegurar que todos los valores son numéricos
         patient_df = pd.DataFrame([patient_data])
         patient_df = patient_df.apply(pd.to_numeric, errors='coerce')
-        print(f"Datos convertidos a DataFrame:\n{patient_df}")
 
-        # Verificar valores NaN
-        if patient_df.isnull().values.any():
-            print("Hay valores NaN en los datos ingresados.")
-            return jsonify({'error': 'Datos incompletos o incorrectos'}), 400
+        # Cargar el scaler en esta ruta específica
+        with open('scaler.pkl', 'rb') as f:
+            scaler = pickle.load(f)
+        
+        # Confirmar el tipo de scaler
+        print(f"Tipo de scaler después de cargar: {type(scaler)}")
+        if not isinstance(scaler, StandardScaler):
+            raise ValueError("El objeto cargado no es una instancia de StandardScaler")
 
-        # Escalar los datos del paciente
-        print("Ajustando y transformando los datos con scaler...")
-        scaler.fit(patient_df)  # Asegúrate de haber ajustado el scaler con datos previamente
+        # Transformar los datos del paciente con el scaler
+        print("Transformando los datos con el scaler cargado en tiempo real...")
         patient_scaled = scaler.transform(patient_df)
-        print(f"Datos escalados: {patient_scaled}")
+        print("Datos escalados:", patient_scaled)
 
         # Realizar la predicción
-        print("Realizando la predicción con el modelo...")
         prediction = model1.predict(patient_scaled)[0]
         prediction_text = 'Alto riesgo' if prediction == 1 else 'Bajo riesgo'
-        print(f"Predicción: {prediction_text}")
 
-        # Guardar datos en la sesión
-        session['patient_data'] = patient_data
-        session['prediction'] = prediction_text
         return jsonify({'prediction': prediction_text})
 
     except Exception as e:
-        print(f"Error en la predicción: {e}")  # Mostrar error en la consola
+        print("Error en la predicción:")
+        traceback.print_exc()  # Imprime la traza completa del error
         return jsonify({'error': 'Ocurrió un error al predecir el riesgo.'}), 500
-
-
-
-from flask import request, jsonify, json
-
-@app.route('/test_chat', methods=['POST'])
-def test_chat():
-    print("Request Headers:", request.headers)
-    print("Request Data (raw):", request.data)  # Muestra el cuerpo en bruto
-
-    try:
-        # Intenta decodificar directamente el JSON desde el cuerpo
-        data = json.loads(request.data)
-        print("Parsed JSON data:", data)  # Mostrar el JSON para ver si se procesa correctamente
-
-        # Respuesta de prueba para ver si se procesa correctamente
-        if 'message' in data:
-            return jsonify({'response': f"Mensaje recibido: {data['message']}"})
-        else:
-            return jsonify({'error': 'No se encontró el campo message.'}), 400
-
-    except json.JSONDecodeError as e:
-        print(f"Error al decodificar JSON: {e}")
-        return jsonify({'error': 'La solicitud no contiene un JSON válido.'}), 400
-
-
 from flask import json
 
 @app.route('/chat', methods=['POST'])
